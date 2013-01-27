@@ -42,13 +42,12 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.androidquery.AQuery;
@@ -807,19 +806,17 @@ public class BitmapAjaxCallback extends AbstractAjaxCallback<Bitmap, BitmapAjaxC
 		Animation anim = null;
 		
 		if(fadeIn(animation, source)){	
-			if(preset == null){
-				anim = new AlphaAnimation(0, 1);
-				anim.setInterpolator(new DecelerateInterpolator()); 
-				anim.setDuration(FADE_DUR);
-			}else{
-				
-				Drawable pd = makeDrawable(iv, preset, ratio, anchor);
-				Drawable[] ds = new Drawable[]{pd, d};
-				TransitionDrawable td = new TransitionDrawable(ds);
-				td.setCrossFadeEnabled(true);				
-				td.startTransition(FADE_DUR);
-				d = td;
+			Drawable pd;
+			if(preset == null) {
+				pd = new ColorDrawable(0x0);
+			} else {
+				pd = makeDrawable(iv, preset, ratio, anchor);
 			}
+			Drawable[] ds = new Drawable[]{pd, d};
+			TransitionDrawable td = new TransitionDrawable(ds);
+			td.setCrossFadeEnabled(true);				
+			td.startTransition(FADE_DUR);
+			d = td;
 		}else if(animation > 0){
 			anim = AnimationUtils.loadAnimation(iv.getContext(), animation);
 		}
