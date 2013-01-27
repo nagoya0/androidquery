@@ -45,6 +45,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.util.FloatMath;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -814,6 +815,7 @@ public class BitmapAjaxCallback extends AbstractAjaxCallback<Bitmap, BitmapAjaxC
 			}
 			Drawable[] ds = new Drawable[]{pd, d};
 			TransitionDrawable td = new TransitionDrawable(ds);
+			justifyLayerRatios(iv, td);
 			td.setCrossFadeEnabled(true);				
 			td.startTransition(FADE_DUR);
 			d = td;
@@ -842,6 +844,50 @@ public class BitmapAjaxCallback extends AbstractAjaxCallback<Bitmap, BitmapAjaxC
 				if(source == AjaxStatus.NETWORK) return true;
 			default:
 				return false;
+		}
+		
+	}
+	
+	private static void justifyLayerRatios(ImageView iv, TransitionDrawable td){
+		
+		int viewW = iv.getWidth() - iv.getPaddingLeft() - iv.getPaddingRight();
+		int viewH = iv.getHeight() - iv.getPaddingTop() - iv.getPaddingBottom();
+		float viewRatio = (float)viewH / viewW;
+		
+		Drawable drawable0 = td.getDrawable(0);
+		int drawable0W = drawable0.getIntrinsicWidth();
+		int drawable0H = drawable0.getIntrinsicHeight();
+		float drawable0Ratio = (float)drawable0H / drawable0W;
+		if(viewRatio == drawable0Ratio) {
+		} else if(viewRatio > drawable0Ratio) {
+			// height is too short.
+			int scaledDrawableH = (int) FloatMath.ceil(drawable0W * viewRatio);
+			int halfInset = Math.abs(drawable0H - scaledDrawableH) / 2;
+			td.setLayerInset(0, 0, halfInset, 0, halfInset);
+			drawable0H += halfInset * 2;
+		} else {
+			// width is too short.
+			int scaledDrawableW = (int) FloatMath.ceil(drawable0H / viewRatio);
+			int halfInset = Math.abs(drawable0W - scaledDrawableW) / 2;
+			td.setLayerInset(0, halfInset, 0, halfInset, 0);
+			drawable0W += halfInset * 2;
+		}
+		
+		Drawable drawable1 = td.getDrawable(1);
+		int drawable1W = drawable1.getIntrinsicWidth();
+		int drawable1H = drawable1.getIntrinsicHeight();
+		float drawable1Ratio = (float)drawable1H / drawable1W;
+		if(viewRatio == drawable1Ratio) {
+		} else if(viewRatio > drawable1Ratio) {
+			// height is too short.
+			int scaledDrawableH = (int) FloatMath.ceil(drawable0W * drawable1Ratio);
+			int halfInset = Math.abs(drawable0H - scaledDrawableH) / 2;
+			td.setLayerInset(1, 0, halfInset, 0, halfInset);
+		} else {
+			// width is too short.
+			int scaledDrawableW = (int) FloatMath.ceil(drawable0H / drawable1Ratio);
+			int halfInset = Math.abs(drawable0W - scaledDrawableW) / 2;
+			td.setLayerInset(1, halfInset, 0, halfInset, 0);
 		}
 		
 	}
