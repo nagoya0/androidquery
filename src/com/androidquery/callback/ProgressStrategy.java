@@ -9,8 +9,8 @@ import android.widget.ProgressBar;
 public interface ProgressStrategy {
 
 	public void reset(Object progress);
-	public void setBytes(Object progress, int bytes);
-	public void increment(Object progress, int delta);
+	public void setBytes(Object progress, long bytes);
+	public void increment(Object progress, long delta);
 	public void done(Object progress);
 	public void showProgress(Object progress, String url, boolean show);
 }
@@ -18,8 +18,8 @@ public interface ProgressStrategy {
 /* package */ abstract class StrategyBase implements ProgressStrategy {
 	
 	protected boolean unknown;
-	protected int bytes;
-	protected int current;
+	protected long bytes;
+	protected long current;
 	protected String url;
 	
 	@Override
@@ -30,7 +30,7 @@ public interface ProgressStrategy {
 	}
 	
 	@Override
-	public void setBytes(Object progress, int bytes) {
+	public void setBytes(Object progress, long bytes) {
 		if(bytes <= 0){
 			unknown = true;
 			bytes = 10000;
@@ -40,7 +40,7 @@ public interface ProgressStrategy {
 	}
 	
 	@Override
-	public void increment(Object progress, int delta) {
+	public void increment(Object progress, long delta) {
 	}
 	
 	@Override
@@ -65,17 +65,17 @@ public interface ProgressStrategy {
 	}
 	
 	@Override
-	public void setBytes(Object progress, int bytes) {
+	public void setBytes(Object progress, long bytes) {
 		super.setBytes(progress, bytes);
 		ProgressBar pb = (ProgressBar) progress;
 		pb.setProgress(0);
-		pb.setMax(bytes);
+		pb.setMax((int) bytes);
 	}
 	
 	@Override
-	public void increment(Object progress, int delta) {
+	public void increment(Object progress, long delta) {
 		ProgressBar pb = (ProgressBar) progress;
-		pb.incrementProgressBy(unknown ? 1 : delta);
+		pb.incrementProgressBy((int) (unknown ? 1 : delta));
 	}
 	
 	@Override
@@ -97,17 +97,17 @@ public interface ProgressStrategy {
 	}
 	
 	@Override
-	public void setBytes(Object progress, int bytes) {
+	public void setBytes(Object progress, long bytes) {
 		super.setBytes(progress, bytes);
 		ProgressDialog pd = (ProgressDialog) progress;
 		pd.setProgress(0);
-		pd.setMax(bytes);
+		pd.setMax((int) bytes);
 	}
 	
 	@Override
-	public void increment(Object progress, int delta) {
+	public void increment(Object progress, long delta) {
 		ProgressDialog pd = (ProgressDialog) progress;
-		pd.incrementProgressBy(unknown ? 1 : delta);
+		pd.incrementProgressBy((int) (unknown ? 1 : delta));
 	}
 	
 	@Override
@@ -128,14 +128,14 @@ public interface ProgressStrategy {
 	}
 
 	@Override
-	public void increment(Object progress, int delta) {
+	public void increment(Object progress, long delta) {
 		Activity act = (Activity) progress;
 		int p;
 		if(unknown){
-			p = current++;
+			p = (int) current++;
 		}else{
 			current+= delta;
-			p = (10000 * current) / bytes;
+			p = (int) ((double)current / bytes * 10000);
 		}
 		if(p > 9999){
 			p = 9999;
