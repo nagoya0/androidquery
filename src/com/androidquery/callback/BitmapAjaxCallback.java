@@ -261,7 +261,9 @@ public class BitmapAjaxCallback extends AbstractAjaxCallback<Bitmap, BitmapAjaxC
 		}
 		
 		options.inInputShareable = true;
-		options.inPurgeable = true;
+		if (AQuery.SDK_INT < 19) {
+			options.inPurgeable = true;
+		}
 		
 		
 		
